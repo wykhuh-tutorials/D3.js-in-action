@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+  <link rel="stylesheet" href="../css/foundation.min.css">
+  <link rel="stylesheet" href="../css/normalize.css">
+
+  <script src="../lib/d3.min.js" charset="utf-8"></script>
+  <script src="../js/typingSpeed.js" charset="utf-8"></script>
+  <script src="../js/typingSpeed_datavis.js" charset="utf-8"></script>
+
+  <style>
+    svg {
+      width: 100%;
+      height: 95px;
+      border-bottom: 1px solid #aaa;
+      margin-bottom: 15px;
+    }
+
+    .text-body {
+      color: #ccc;
+    }
+
+    .highlight {
+      color: red;
+    }
+  </style>
+</head>
+
+<body>
+
+
+  <div class="row text-center">
+    <div class="large-12 columns">
+      <h1>Typing Test</h1>
+    </div>
+  </div>
+
+
+  <div class="row">
+    <div class="large-12 columns">
+      <svg></svg>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="large-6 columns">
+      <p class="text-body"></p>
+    </div>
+
+    <div class="large-6 columns" role="content">
+      <form action="">
+        <textarea autofocus name="name" rows="8" cols="40"></textarea>
+      </form>
+    </div>
+  </div>
+
+
+  <script>
+    document.onload = (function() {
+      'use strict';
+
+      var wordCount = 0,
+        totalTime = 0,
+        ts = TypingSpeed,
+        timeobj,
+        text,
+        interval = 250,
+        dataViz = DataViz(),
+        textEl;
+
+      document.addEventListener('keydown', ts.captureKeypress);
+
+      text =
+        "Sir Walter Elliot, of Kellynch Hall, in Somersetshire, was a man who, for his own amusement, never took up any book but the Baronetage; there he found occupation for an idle hour, and consolation in a distressed one; there his faculties were roused into admiration and respect, by contemplating the limited remnant of the earliest patents; there any unwelcome sensations, arising from domestic affairs changed naturally into pity and contempt as he turned over the almost endless creations of the last century; and there, if every other leaf were powerless, he could read his own history with an interest which never failed.";
+
+      textEl = document.querySelector('.text-body');
+      textEl.innerText = text;
+
+      function update() {
+        var data;
+
+        wordCount = ts.getWordCount();
+        totalTime = Date.now() - ts.times[0];
+        data = {
+          wordCount: wordCount,
+          totalTime: totalTime,
+          wpm: Math.round(ts.wordPerMinute(wordCount, totalTime)) || 0,
+          correctWordCount: ts.getCorrectWordCount(),
+          wrongWordCount: ts.getWrongWordCount()
+        }
+
+        highlightWord(wordCount);
+        dataViz.update(data);
+      }
+
+
+      function highlightWord(wordCount) {
+        var textArr = text.split(' ');
+
+        textArr[wordCount] = '<span class="highlight">' + textArr[wordCount] + '</span>';
+
+        textEl.innerHTML = textArr.join(' ');
+      }
+
+      dataViz.setup();
+      ts.createWordsArr(text);
+
+      timeobj = setInterval(update, interval);
+
+
+    })();
+  </script>
+</body>
+
+</html>
