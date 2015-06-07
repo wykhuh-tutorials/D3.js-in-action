@@ -1,5 +1,7 @@
-var DataViz = function() {
+var dataViz = (function() {
   'use strict';
+
+  console.log('dataViz.js loaded');
 
   var barX = 80,
     barHeight = 15,
@@ -17,7 +19,7 @@ var DataViz = function() {
   }
 
 
-  function update(data) {
+  function updateViz(data) {
 
     var allWordsOptions = {
       class: '.all-words',
@@ -71,7 +73,7 @@ var DataViz = function() {
   }
 
 
-  function setup() {
+  function init() {
 
     var allWordsOptions = {
       bar: {
@@ -144,9 +146,9 @@ var DataViz = function() {
   }
 
   return {
-    setup: setup,
-    update: update
+    init: init,
+    updateViz: updateViz
   };
 
 
-};
+})();
