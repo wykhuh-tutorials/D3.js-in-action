@@ -1,101 +1,30 @@
-var TypingSpeed =(function() {
-  'use strict';
+var TypingSpeed = (function() {
+  "use strict";
 
-  console.log('TypingSpeed.js loaded');
+  console.log("TypingSpeed.js loaded");
 
-  var times = [];
-  var wordCount = 0;
-  var correctWordCount = 0;
-  var wrongWordCount = 0;
-  var totalTime = 0;
-  var allWPM = 0;
-  var correctWPM = 0;
-  var textArr = [];
-  var textArrHighlight = [];
-  var textEl;
-  var currentWord;
-  var currentLetter;
-  var prevCode;
-  var minutes = 0;
-  var spaceCode = ' '.charCodeAt();
-  var randomKeys = {
-    13: 'return',
-    16: 'shift',
-    8: 'delete',
-    9: 'tab',
-    20: 'caps'
-  };
+  var times = [],
+    wordCount = 0,
+    correctWordCount = 0,
+    textArr = [],
+    textArrHighlight = [],
+    textEl,
+    inputEl,
+    currentWord,
+    currentChar,
+    inputText,
+    prevInputLength = 0;
 
-  wrongWordCount = wordCount - correctWordCount;
-
-  function captureInputText(e) {
-    console.log(e.keyCode);
-
-    if(times.length === 0){
-      times.push(Date.now());
-    }
-
-    if (e.keyCode === spaceCode && prevCode === e.keyCode) {
-      return;
-    }
-    prevCode = e.keyCode;
-
-    if (e.keyCode === spaceCode) {
-
-      wordCount += 1;
-      highlightWord(wordCount);
-      renderText(textArrHighlight);
-
-
-      if (verifyWord(currentWord)) {
-
-        correctWordCount += 1;
-      }
-      currentWord = '';
-
-      times.push(Date.now());
-
-      if (wordCount > 1) {
-
-        totalTime = calculateTotalTime(times);
-        minutes = calculateMinutes(totalTime);
-        allWPM = wordPerMinute(wordCount, minutes);
-        correctWPM = wordPerMinute(correctWordCount, minutes);
-      }
-    } else if (randomKeys[e.keyCode]) {
-      return;
-    } else {
-      currentLetter = convertCodeToLetter(e.keyCode);
-      currentWord = captureCurrentWord(currentLetter);
-    }
-  }
-
-  function getWordCount(){
+  function getWordCount() {
     return wordCount;
   }
 
-  function getCorrectWordCount(){
+  function getCorrectWordCount() {
     return correctWordCount;
   }
 
-  function getWrongWordCount(){
+  function getWrongWordCount() {
     return wordCount - correctWordCount;
-  }
-
-  function getTotalTime(){
-    return Date.now() - times[0];
-  }
-
-  function getWPM(){
-    return correctWPM;
-  }
-
-  function calculateTotalTime(times) {
-    return Date.now() - times[0];
-  }
-
-  function calculateMinutes(totalTime) {
-    return totalTime / (1000 * 60);
   }
 
   function wordPerMinute(count, usecs) {
@@ -103,69 +32,118 @@ var TypingSpeed =(function() {
     return count / minutes;
   }
 
-  function captureCurrentWord(currentLetter) {
-    return (currentWord || '') + currentLetter;
-  }
-
-  function convertCodeToLetter(code) {
-    return String.fromCharCode(code);
-  }
-
   function verifyWord() {
-    // keydown always returns keyCode for uppercase letters, so need toLowerCase
-    console.log(currentWord.toLowerCase(), textArr[wordCount - 1].toLowerCase())
-    return currentWord.toLowerCase() === textArr[wordCount - 1].toLowerCase();
+    // console.log("verifyWord", currentWord === textArr[wordCount - 1],
+      // currentWord, textArr[wordCount - 1]);
+
+    var res = currentWord === textArr[wordCount - 1];
+    currentWord = undefined;
+    return res;
   }
 
   function createWordsArr(text) {
     // textArr is used for comparsion, hightlightTextArr is used for html html
-    textArr = text.split(' ');
-    textArrHighlight = text.split(' ');
+    textArr = text.split(" ");
+    textArrHighlight = text.split(" ");
   }
 
-  function unhighlightWord(index){
+  function unhighlightWord(index) {
     var cleanWord = textArrHighlight[index].match(/<span.*?>(.*?)<\/span>/);
-    textArrHighlight[index] =   cleanWord[1];
+    textArrHighlight[index] = cleanWord[1];
   }
 
   function highlightWord(index) {
-    if(index >= 1){
-      unhighlightWord(index-1);
+    if (index >= 1) {
+      unhighlightWord(index - 1);
     }
-    textArrHighlight[index] = '<span class="highlight">' + textArrHighlight[index] + '</span>';
+    textArrHighlight[index] = '<span class="highlight">' + textArrHighlight[index] + "</span>";
   }
 
-  function renderText(textArr) {
-    textEl.innerHTML =  textArr.join(' ');
+  function renderText(arr) {
+    textEl.innerHTML = arr.join(" ");
   }
 
-  function stopTimer(intervalID) {
+  function stopTest(intervalID) {
     clearInterval(intervalID);
   }
 
-  function setTextEl(el){
-     textEl = el;
+
+  function getLastWord() {
+    var words = inputText.split(" ");
+    // console.log('getLastWord', words[words.length - 1]);
+    return words[words.length - 1];
   }
 
+  function captureInputText(input) {
+    // console.log(input)
+
+    currentChar = input.slice(-1);
+    inputText = input;
+
+    if (!times.length) {
+      times.push(Date.now());
+    }
+
+    // ignores key presses that don't add any characters
+    if (prevInputLength === inputText.length || currentChar === "\n") {
+      return;
+    }
+
+    // igornes spaces that occur because we deleted existing characters
+    // 'abc cd' -> 'abc '
+    if (currentChar === " " && (prevInputLength < inputText.length)) {
+      prevInputLength = inputText.length;
+      wordCount += 1;
+
+      highlightWord(wordCount);
+      renderText(textArrHighlight);
+
+      if (verifyWord(currentWord)) {
+        correctWordCount += 1;
+      }
+
+      times.push(Date.now());
+
+    } else {
+      prevInputLength = inputText.length;
+      currentWord = getLastWord();
+    }
+  }
+
+
   function init(options) {
-    setTextEl(options.textEl);
+    textEl = options.textEl;
+    inputEl = options.inputEl;
     createWordsArr(options.text);
     highlightWord(0);
     renderText(textArrHighlight);
   }
 
 
+  function reset(text) {
+    times = [];
+    wordCount = 0;
+    correctWordCount = 0;
+    createWordsArr(text);
+    currentWord = undefined;
+    currentChar = undefined;
+    inputText = undefined;
+    prevInputLength = 0;
+    highlightWord(0);
+    renderText(textArrHighlight);
+    inputEl.value = "";
+  }
+
   return {
-    createWordsArr: createWordsArr,
-    times: times,
+    captureInputText: captureInputText,
     getWordCount: getWordCount,
-    wordPerMinute: wordPerMinute,
+    times: times,
     getCorrectWordCount: getCorrectWordCount,
     getWrongWordCount: getWrongWordCount,
-    captureInputText: captureInputText,
-    stopTimer: stopTimer,
-    init: init
+    wordPerMinute: wordPerMinute,
+    init: init,
+    stopTest: stopTest,
+    reset: reset
   };
-
 
 })();

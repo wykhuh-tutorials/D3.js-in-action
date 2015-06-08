@@ -1,48 +1,47 @@
 var dataViz = (function() {
-  'use strict';
+  "use strict";
 
-  console.log('dataViz.js loaded');
+  console.log("dataViz.js loaded");
 
   var barX = 80,
     barHeight = 15,
     textX = 10;
 
-  var svg = d3.select('svg');
+  var svg = d3.select("svg");
 
   function updateBar(options) {
     d3.select(options.class)
       .transition()
-      .attr('width', options.data * 4);
+      .attr("width", options.data * 4);
 
-    d3.select(options.class + '-label')
-      .text(options.label + ' (' + options.data + '):');
+    d3.select(options.class + "-label")
+      .text(options.label + " (" + options.data + "):");
   }
-
 
   function updateViz(data) {
 
     var allWordsOptions = {
-      class: '.all-words',
+      class: ".all-words",
       data: data.wordCount,
-      label: 'total'
+      label: "total"
     };
 
     var correctWordsOptions = {
-      class: '.correct-words',
+      class: ".correct-words",
       data: data.correctWordCount,
-      label: 'correct'
+      label: "correct"
     };
 
     var wrongWordsOptions = {
-      class: '.wrong-words',
+      class: ".wrong-words",
       data: data.wrongWordCount,
-      label: 'wrong'
+      label: "wrong"
     };
 
     var wpmOptions = {
-      class: '.wpm',
+      class: ".wpm",
       data: data.wpm,
-      label: 'wpm'
+      label: "wpm"
     };
 
     updateBar(allWordsOptions);
@@ -53,7 +52,7 @@ var dataViz = (function() {
   }
 
   function createBar(options) {
-    svg.append('rect')
+    svg.append("rect")
       .attr({
         class: options.bar.class,
         x: options.bar.x,
@@ -62,16 +61,15 @@ var dataViz = (function() {
         fill: options.bar.fill
       });
 
-    svg.append('text')
+    svg.append("text")
       .attr({
-        class: options.bar.class + '-label',
+        class: options.bar.class + "-label",
         x: options.label.x,
         y: options.label.y
       })
-      .style('font-size', options.label.fontSize)
-      .text(options.label.text + ' (0):');
+      .style("font-size", options.label.fontSize)
+      .text(options.label.text + " (0):");
   }
-
 
   function init() {
 
@@ -80,14 +78,14 @@ var dataViz = (function() {
         x: barX,
         y: 10,
         height: barHeight,
-        fill: 'lightgrey',
-        class: 'all-words'
+        fill: "lightgrey",
+        class: "all-words"
       },
       label: {
         x: textX,
         y: 20,
-        fontSize: '12px',
-        text: 'total'
+        fontSize: "12px",
+        text: "total"
       }
     };
 
@@ -96,14 +94,14 @@ var dataViz = (function() {
         x: barX,
         y: 30,
         height: barHeight,
-        fill: 'green',
-        class: 'correct-words'
+        fill: "green",
+        class: "correct-words"
       },
       label: {
         x: textX,
         y: 40,
-        fontSize: '12px',
-        text: 'correct'
+        fontSize: "12px",
+        text: "correct"
       }
     };
 
@@ -112,14 +110,14 @@ var dataViz = (function() {
         x: barX,
         y: 50,
         height: barHeight,
-        fill: 'red',
-        class: 'wrong-words'
+        fill: "red",
+        class: "wrong-words"
       },
       label: {
         x: textX,
         y: 60,
-        fontSize: '12px',
-        text: 'wrong'
+        fontSize: "12px",
+        text: "wrong"
       }
     };
 
@@ -128,14 +126,14 @@ var dataViz = (function() {
         x: barX,
         y: 70,
         height: barHeight,
-        fill: 'blue',
-        class: 'wpm'
+        fill: "blue",
+        class: "wpm"
       },
       label: {
         x: textX,
         y: 80,
-        fontSize: '12px',
-        text: 'wpm'
+        fontSize: "12px",
+        text: "wpm"
       }
     };
 
@@ -149,6 +147,5 @@ var dataViz = (function() {
     init: init,
     updateViz: updateViz
   };
-
 
 })();

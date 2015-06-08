@@ -1,28 +1,35 @@
 document.onload = (function(dataViz, TypingSpeed) {
-  'use strict';
+  "use strict";
 
-  console.log('init.js loaded');
+  console.log("init.js loaded");
 
   // ======== initialize  stuff ========
 
   var wordCount = 0,
     totalTime = 0,
     ts = TypingSpeed,
-    timeobj,
+    intervalID,
     text,
-    interval = 2000,
-    textEl,
-    typingSpeedOptions = {};
+    interval = 500,
+    typingSpeedOptions = {},
+    stopButtonEl,
+    resetButtonEl,
+    inputEl = document.querySelector(".textInput");
 
-  document.addEventListener('keydown', ts.captureInputText);
+  document.addEventListener("keyup", function() {
+    ts.captureInputText(inputEl.value)
+  });
 
-  text =
-    "Sir Walter Elliot, of Kellynch Hall, in Somersetshire, was a man who, for his own amusement, never took up any book but the Baronetage; there he found occupation for an idle hour, and consolation in a distressed one; there his faculties were roused into admiration and respect, by contemplating the limited remnant of the earliest patents; there any unwelcome sensations, arising from domestic affairs changed naturally into pity and contempt as he turned over the almost endless creations of the last century; and there, if every other leaf were powerless, he could read his own history with an interest which never failed.";
+  stopButtonEl = document.querySelector(".stop-button");
+  stopButtonEl.addEventListener("click", function() {
+    ts.stopTest(intervalID);
+  });
+
+  resetButtonEl = document.querySelector(".reset-button");
+  resetButtonEl.addEventListener("click", reset);
 
 
-  function renderText(string) {
-    textEl.innerText = string;
-  }
+  text = "Sir Walter Elliot, of Kellynch Hall, in Somersetshire, was a man who, for his own amusement, never took up any book but the Baronetage; there he found occupation for an idle hour, and consolation in a distressed one; there his faculties were roused into admiration and respect, by contemplating the limited remnant of the earliest patents; there any unwelcome sensations, arising from domestic affairs changed naturally into pity and contempt as he turned over the almost endless creations of the last century; and there, if every other leaf were powerless, he could read his own history with an interest which never failed.";
 
   function updateViz() {
     var data;
@@ -40,18 +47,25 @@ document.onload = (function(dataViz, TypingSpeed) {
     dataViz.updateViz(data);
   }
 
+  function reset() {
+    ts.reset(text);
+    intervalID = setInterval(updateViz, interval);
+  }
+
   // ======== start doing stuff ========
 
   dataViz.init();
 
   typingSpeedOptions = {
     text: text,
-    textEl: document.querySelector('.text-body'),
-    inputEl: document.querySelector('.textInput')
+    textEl: document.querySelector(".text-body"),
+    inputEl: document.querySelector(".textInput")
   };
 
   ts.init(typingSpeedOptions);
 
-  var intervalID = setInterval(updateViz, 500);
+  intervalID = setInterval(updateViz, interval);
+
+  // ts.stopTimer(intervalID)
 
 })(dataViz, TypingSpeed);
